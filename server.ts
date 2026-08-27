@@ -594,7 +594,7 @@ app.get("/api/ai/challenges", async (_req, res) => {
   }
 });
 
-// Vite middleware and static serving
+// Vite middleware and static serving (used in local and standalone container environments)
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -616,4 +616,10 @@ async function startServer() {
   });
 }
 
-startServer();
+// Only launch standalone server if not running as a Vercel Serverless Function
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;
+export { app };
