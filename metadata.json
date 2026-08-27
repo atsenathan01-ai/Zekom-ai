@@ -1,0 +1,6 @@
+{
+  "name": "ZEKROM",
+  "description": "An intelligent creative workspace designed to transform simple ideas into real projects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
