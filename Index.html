@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Île des Découvertes — Spécial CM2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sun:#FFC738; --sun-dark:#F5A623;
+    --jungle:#2FAE6F; --jungle-dark:#1E8A56;
+    --coral:#FF6B5B; --coral-dark:#d94e3f;
+    --sky:#4AC7E0; --sky-dark:#2E9DB5;
+    --violet:#9B7BE0; --violet-dark:#7C5CC4;
+    --pink:#FF7FAE; --pink-dark:#E85D8E;
+    --deepsea:#1B3B5F; --sand:#FFF6E6; --ink:#2A2A3C;
+    --line:#E4E9F5; --muted:#8b93b0; --white:#fff;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Nunito', sans-serif;
+    background: linear-gradient(180deg, #BDEFFF 0%, #FFF6E6 40%);
+    color: var(--ink);
+    min-height:100vh;
+    padding-bottom: 40px;
+  }
+  h1,h2,h3,.display{ font-family:'Baloo 2', cursive; }
+  button{ font-family:inherit; }
+  body.intro-active{ overflow:hidden; height:100vh; }
+
+  /* ---------------- INTRO OVERLAY ---------------- */
+  #introOverlay{
+    position:fixed; inset:0; z-index:999;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    background: linear-gradient(135deg, var(--sky) 0%, var(--jungle) 55%, var(--sun) 100%);
+    text-align:center; padding: 28px; overflow:hidden;
+  }
+  #introOverlay.hide{ animation: overlayOut .5s ease forwards; pointer-events:none; }
+  @keyframes overlayOut{ to{ opacity:0; visibility:hidden; } }
+
+  .intro-hearts{ position:absolute; inset:0; pointer-events:none; }
+  .intro-hearts span{
+    position:absolute; bottom:-10%; font-size:1.6rem; opacity:0;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp{
+    0%{ transform: translateY(0) rotate(0deg); opacity:0; }
+    10%{ opacity:.9; }
+    90%{ opacity:.7; }
+    100%{ transform: translateY(-115vh) rotate(340deg); opacity:0; }
+  }
+
+  .intro-owl{ font-size:4.6rem; animation: owlPop .7s cubic-bezier(.34,1.56,.64,1) both; }
+  @keyframes owlPop{ 0%{ transform:scale(0) rotate(-20deg); opacity:0; } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+
+  .intro-title{
+    font-size: clamp(1.7rem, 6.5vw, 2.6rem); color:#fff; margin: 8px 0 0;
+    text-shadow: 3px 3px 0 rgba(0,0,0,.15);
+    opacity:0; animation: fadeUp .6s ease .35s forwards;
+  }
+  .intro-cm2{
+    display:inline-block; background:#fff; color:var(--jungle-dark); font-weight:800;
+    font-family:'Baloo 2'; font-size:.85rem; padding:4px 14px; border-radius:999px;
+    margin-top:10px; opacity:0; animation: fadeUp .6s ease .6s forwards;
+  }
+  .intro-dedication{
+    background: rgba(255,255,255,.97); border-radius:22px; padding: 18px 22px;
+    margin: 20px 0; max-width: 380px; box-shadow: 0 8px 0 rgba(0,0,0,.12);
+    opacity:0; animation: fadeUp .6s ease .95s forwards;
+  }
+  .intro-dedication p{
+    margin:0; font-family:'Baloo 2'; font-weight:700; color:var(--deepsea);
+    font-size:1.1rem; line-height:1.45;
+  }
+  .intro-sub{
+    color:#fff; font-weight:700; margin: 0 0 18px; opacity:0;
+    animation: fadeUp .6s ease 1.2s forwards;
+  }
+  .intro-btn{
+    font-family:'Baloo 2'; font-weight:800; font-size:1.05rem; color:var(--deepsea);
+    background:#fff; border:none; padding:14px 34px; border-radius:999px; cursor:pointer;
+    box-shadow: 0 5px 0 rgba(0,0,0,.18);
+    opacity:0; animation: fadeUp .6s ease 1.5s forwards, pulse 1.8s ease 2.3s infinite;
+  }
+  .intro-btn:hover{ transform: translateY(-2px); }
+  .intro-credit{
+    color:#fff; opacity:0; font-weight:700; font-size:.8rem; letter-spacing:.3px;
+    margin-top:16px;
+    animation: fadeUp .6s ease 1.85s forwards;
+  }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes pulse{ 0%,100%{ box-shadow:0 5px 0 rgba(0,0,0,.18);} 50%{ box-shadow:0 5px 0 rgba(0,0,0,.18), 0 0 0 8px rgba(255,255,255,.25);} }
+
+  @media (prefers-reduced-motion: reduce){
+    #introOverlay *{ animation: none !important; }
+    .intro-owl, .intro-title, .intro-cm2, .intro-dedication, .intro-sub, .intro-btn, .intro-credit{ opacity:1 !important; transform:none !important; }
+    .intro-hearts{ display:none; }
+  }
+
+  /* ---------------- APP ROOT ---------------- */
+  #appRoot{ opacity:0; transition: opacity .6s ease; }
+  #appRoot.visible{ opacity:1; }
+
+  /* ---------------- TOP BAR ---------------- */
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background: rgba(255,255,255,.9);
+    backdrop-filter: blur(6px);
+    border-bottom: 2px solid var(--line);
+    padding: 10px 16px;
+    display:flex; align-items:center; gap:12px;
+    flex-wrap:wrap;
+  }
+  .brand{
+    font-family:'Baloo 2'; font-weight:800; color:var(--deepsea);
+    font-size:1.1rem; display:flex; align-items:center; gap:8px;
+    margin-right:auto;
+  }
+  .cm2-badge{
+    background: var(--coral); color:#fff; font-size:.65rem; font-weight:800;
+    padding:3px 10px; border-radius:999px; letter-spacing:.4px;
+  }
+  .xp-widget{
+    display:flex; align-items:center; gap:10px;
+    background: var(--sand);
+    border-radius: 999px;
+    padding: 6px 14px 6px 6px;
+  }
+  .avatar-mini{
+    width:36px;height:36px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.2rem; flex:none; position:relative;
+    background-size:cover; background-position:center;
+  }
+  .lvl-info{ line-height:1.15; }
+  .lvl-info .lvl-label{ font-weight:800; font-size:.8rem; color:var(--deepsea); }
+  .xp-bar-track{
+    width:90px; height:8px; border-radius:999px; background:#fff; overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .xp-bar-fill{
+    height:100%; background: linear-gradient(90deg, var(--jungle), var(--sky));
+    border-radius:999px; transition: width .4s ease;
+  }
+  .coin-pill{
+    display:flex; align-items:center; gap:5px;
+    background:var(--white); border-radius:999px;
+    padding:6px 12px; font-weight:800; color:var(--sun-dark);
+    border:1px solid var(--line);
+    font-size:.9rem;
+  }
+  .nav-tabs{ display:flex; gap:6px; }
+  .nav-tab{
+    border:none; background:transparent; cursor:pointer;
+    font-weight:800; color:var(--muted);
+    padding:8px 14px; border-radius:999px; font-size:.9rem;
+  }
+  .nav-tab.active{ background:var(--deepsea); color:#fff; }
+
+  .page{ display:none; max-width: 900px; margin: 0 auto; padding: 20px; }
+  .page.active{ display:block; }
+
+  /* ---------------- HERO / DASHBOARD ---------------- */
+  .hero-mini{ text-align:center; padding: 14px 10px 26px; }
+  .hero-mini .eyebrow{
+    display:inline-block; background: var(--white); color:var(--jungle-dark); font-weight:800;
+    font-size:.75rem; padding:5px 14px; border-radius:999px; margin-bottom:8px;
+    box-shadow: 0 3px 0 rgba(0,0,0,.06);
+  }
+  .hero-mini h1{ font-size: clamp(1.8rem,5vw,2.6rem); color:var(--deepsea); margin:6px 0 4px; text-shadow: 2px 2px 0 var(--sun);}
+  .hero-mini p{ color:#4a5578; font-weight:700; margin:0; }
+
+  .challenge-card{
+    background: linear-gradient(135deg, var(--violet), var(--sky));
+    border-radius:22px; padding:18px 20px; color:#fff;
+    display:flex; align-items:center; gap:16px;
+    margin-bottom: 26px;
+    box-shadow: 0 10px 0 rgba(27,59,95,.10);
+  }
+  .challenge-card .cico{ font-size:2.2rem; flex:none; }
+  .challenge-card h3{ margin:0 0 4px; font-size:1.05rem; }
+  .challenge-card p{ margin:0; font-weight:700; font-size:.85rem; opacity:.95; }
+  .challenge-track{ width:100%; height:10px; background:rgba(255,255,255,.35); border-radius:999px; margin-top:8px; overflow:hidden; }
+  .challenge-fill{ height:100%; background:#fff; border-radius:999px; transition:width .3s ease; }
+  .challenge-badge{
+    flex:none; font-weight:800; background:rgba(255,255,255,.25);
+    padding:6px 12px; border-radius:999px; font-size:.85rem;
+  }
+  .challenge-badge.done{ background:#fff; color:var(--jungle-dark); }
+
+  .islands{ display:flex; flex-direction:column; gap: 14px; }
+  .island{
+    display:flex; align-items:center; gap:16px;
+    background: var(--white);
+    border-radius:22px; padding:16px;
+    box-shadow: 0 7px 0 rgba(27,59,95,.08), 0 9px 18px rgba(27,59,95,.08);
+    cursor:pointer; transition: transform .15s ease;
+  }
+  .island:hover{ transform: translateY(-3px); }
+  .island .icon-badge{
+    flex:none; width:58px;height:58px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.7rem; color:#fff;
+  }
+  .island.math .icon-badge{ background: var(--coral); }
+  .island.francais .icon-badge{ background: var(--jungle); }
+  .island.histoire .icon-badge{ background: var(--sun-dark); }
+  .island.geo .icon-badge{ background: var(--sky); }
+  .island.sciences .icon-badge{ background: var(--violet); }
+  .island.anglais .icon-badge{ background: var(--pink); }
+  .island h3{ margin:0 0 2px; color:var(--deepsea); font-size:1.1rem; }
+  .island p{ margin:0; font-weight:700; color:var(--muted); font-size:.82rem; }
+  .island .go{
+    margin-left:auto; font-family:'Baloo 2'; font-weight:700; color:#fff;
+    background: var(--sun-dark); padding:9px 16px; border-radius:999px; flex:none;
+    box-shadow: 0 3px 0 #c97e13; font-size:.85rem;
+  }
+
+  /* ---------------- GAME PANEL ---------------- */
+  .game-card{
+    background: var(--white); border-radius:26px; padding:26px;
+    box-shadow: 0 10px 0 rgba(27,59,95,.08), 0 14px 30px rgba(27,59,95,.10);
+  }
+  .game-card-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .game-card-header h2{ margin:0; color:var(--deepsea); font-size:1.35rem; }
+  .back-btn{ background:none;border:none;font-weight:800;color:var(--muted);cursor:pointer;font-size:.9rem; }
+  .back-btn:hover{ color:var(--coral); }
+  .score-row{ display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+  .pill{ background:var(--sand); border-radius:999px; padding:7px 14px; font-weight:800; color:var(--deepsea); font-size:.85rem; }
+  .question-box{
+    background:#F5F8FF; border-radius:20px; padding:22px; text-align:center;
+    margin-bottom:18px; min-height:80px; display:flex; align-items:center; justify-content:center;
+  }
+  .question-box .qtext{ font-family:'Baloo 2'; font-size:1.25rem; color:var(--deepsea); }
+  .choices{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .choice-btn{
+    font-weight:800; font-size:.9rem; padding:14px 8px; border-radius:14px;
+    border:3px solid var(--line); background:#fff; color:var(--deepsea); cursor:pointer;
+    transition:all .12s ease;
+  }
+  .choice-btn:hover:not(:disabled){ border-color:var(--sky); transform:translateY(-2px); }
+  .choice-btn.correct{ background:var(--jungle); border-color:var(--jungle-dark); color:#fff; }
+  .choice-btn.wrong{ background:var(--coral); border-color:var(--coral-dark); color:#fff; }
+  .choice-btn:disabled{ cursor:default; opacity:.9; }
+  .feedback{ text-align:center; font-weight:800; font-family:'Baloo 2'; margin-top:14px; min-height:26px; }
+  .next-btn{
+    display:none; margin:16px auto 0; font-family:'Baloo 2'; font-weight:700; font-size:1rem; color:#fff;
+    background:var(--sun-dark); border:none; padding:11px 26px; border-radius:999px; cursor:pointer;
+    box-shadow:0 4px 0 #c97e13;
+  }
+  .next-btn.show{ display:block; }
+  .win-screen{ display:none; text-align:center; }
+  .win-screen.show{ display:block; }
+  .win-screen .big-emoji{ font-size:3.2rem; }
+  .win-screen h2{ color:var(--deepsea); margin:6px 0; }
+  .win-screen p{ font-weight:700; color:var(--muted); }
+  .xp-gain{ font-weight:800; color:var(--sun-dark); font-size:1.1rem; margin:6px 0 14px; }
+  .retry-btn, .map-btn{
+    font-family:'Baloo 2'; font-weight:700; color:#fff; border:none;
+    padding:11px 24px; border-radius:999px; cursor:pointer; margin: 4px 6px 0;
+  }
+  .retry-btn{ background:var(--jungle); box-shadow:0 4px 0 var(--jungle-dark); }
+  .map-btn{ background:var(--sky-dark); box-shadow:0 4px 0 #227d92; }
+
+  /* ---------------- PROFILE PAGE ---------------- */
+  .profile-hero{
+    display:flex; align-items:center; gap:24px; flex-wrap:wrap;
+    background: var(--white); border-radius:26px; padding:24px;
+    box-shadow: 0 8px 0 rgba(27,59,95,.08), 0 10px 20px rgba(27,59,95,.08);
+    margin-bottom:24px;
+  }
+  .profile-banner{
+    flex:0 0 100%; width:100%; display:none;
+    justify-content:space-around; align-items:center;
+    font-size:1.4rem; margin-bottom:6px;
+  }
+  .profile-banner span{ display:inline-block; animation: bannerBob 1.8s ease-in-out infinite; }
+  .profile-banner span:nth-child(3n){ animation-delay:.2s; }
+  .profile-banner span:nth-child(3n+1){ animation-delay:.4s; }
+  @keyframes bannerBob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
+
+  .avatar-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; flex:none; }
+  .avatar-stage{
+    position:relative; width:130px; height:130px; border-radius:32px;
+    display:flex; align-items:center; justify-content:center; flex:none;
+    overflow:visible;
+  }
+  .avatar-face{
+    width:84%; height:84%; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:3.6rem; overflow:hidden;
+    background-size:cover; background-position:center;
+  }
+  .avatar-stage .hat{ position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:2.6rem; z-index:3; }
+  .avatar-stage .pet{ position:absolute; bottom:-10px; right:-14px; font-size:2rem; z-index:3; }
+  .avatar-stage .accessory{ position:absolute; bottom:14px; left:50%; transform:translateX(-50%); font-size:1.7rem; z-index:4; }
+
+  .photo-controls{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .photo-btn{
+    font-weight:800; font-size:.75rem; color:var(--deepsea); background:var(--sand);
+    border:none; padding:7px 12px; border-radius:999px; cursor:pointer;
+  }
+  .photo-btn.ghost{ background:#fff; border:2px solid var(--line); color:var(--muted); }
+  .photo-btn:hover{ filter:brightness(.97); }
+
+  .profile-info{ flex:1; min-width:200px; }
+  .profile-info h2{ margin:0 0 6px; color:var(--deepsea); }
+  .name-label{ display:block; font-size:.7rem; font-weight:800; color:var(--muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.4px; }
+  .name-input{
+    font-family:'Baloo 2'; font-size:1.1rem; font-weight:700; color:var(--deepsea);
+    border:2px solid var(--line); border-radius:12px; padding:8px 14px;
+    margin-bottom:10px; width:100%; max-width:220px; background:#F9FBFF;
+  }
+  .name-input:focus{ outline:none; border-color:var(--sky); }
+  .lvl-big{ font-weight:800; color:var(--sun-dark); margin-bottom:8px; }
+  .profile-stats{ display:flex; gap:18px; flex-wrap:wrap; }
+  .stat{ text-align:center; }
+  .stat .num{ font-family:'Baloo 2'; font-weight:800; font-size:1.3rem; color:var(--deepsea); }
+  .stat .lab{ font-size:.75rem; font-weight:700; color:var(--muted); }
+
+  .shop-section h3{ color:var(--deepsea); margin:0 0 12px; }
+  .shop-grid{
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(110px,1fr));
+    gap: 12px; margin-bottom: 26px;
+  }
+  .shop-item{
+    background:var(--white); border-radius:18px; padding:14px 10px; text-align:center;
+    border: 3px solid var(--line); cursor:pointer; transition: all .12s ease;
+  }
+  .shop-item .emoji{ font-size:2rem; }
+  .shop-item .name{ font-weight:800; font-size:.78rem; color:var(--deepsea); margin:4px 0; }
+  .shop-item .price{ font-weight:800; font-size:.78rem; color:var(--sun-dark); }
+  .shop-item.owned .price{ color:var(--jungle-dark); }
+  .shop-item.equipped{ border-color: var(--jungle); background:#EFFBF4; }
+  .shop-item.locked{ opacity:.55; }
+  .shop-item:hover:not(.locked){ transform: translateY(-3px); border-color: var(--sky); }
+
+  footer{ text-align:center; padding:20px; font-weight:700; color:var(--muted); font-size:.85rem; }
+
+  @media (max-width: 560px){
+    .island .go{ display:none; }
+    .choices{ grid-template-columns:1fr; }
+    .profile-hero{ justify-content:center; text-align:center; }
+    .profile-stats{ justify-content:center; }
+    .name-input{ max-width:100%; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    #appRoot *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body class="intro-active">
+
+<!-- ============ INTRO ANIMATION ============ -->
+<div id="introOverlay">
+  <div class="intro-hearts" id="introHearts"></div>
+  <div class="intro-owl">🦉</div>
+  <h1 class="intro-title">L'Île des Découvertes</h1>
+  <span class="intro-cm2">🎓 Spécial CM2</span>
+  <div class="intro-dedication">
+    <p>💛 POUR MA PETITE SŒUR ANAËLLE QUE J'AIME !! 💛<br>Bon courage pour ta rentrée en CM2 !</p>
+  </div>
+  <p class="intro-sub">Apprends en jouant, gagne de l'XP et personnalise ton profil !</p>
+  <button class="intro-btn" id="introBtn">Commencer l'aventure ✨</button>
+  <p class="intro-credit">Made by Nathan 👨‍💻</p>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="appRoot">
+
+<div class="topbar">
+  <div class="brand">🦉 L'Île des Découvertes <span class="cm2-badge">CM2</span></div>
+  <div class="xp-widget">
+    <div class="avatar-mini" id="avatarMini">🙂</div>
+    <div class="lvl-info">
+      <div class="lvl-label" id="lvlLabel">Niveau 1</div>
+      <div class="xp-bar-track"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="coin-pill">✨ <span id="coinCount">0</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-page="home">Carte</button>
+    <button class="nav-tab" data-page="profile">Profil</button>
+  </div>
+</div>
+
+<!-- ============ PAGE: HOME ============ -->
+<div class="page active" id="page-home">
+  <div class="hero-mini">
+    <span class="eyebrow">Programme officiel du CM2</span>
+    <h1>Prêt(e) pour l'aventure, <span id="greetName">Anaëlle</span> ?</h1>
+    <p>Choisis une île et gagne de l'XP !</p>
+  </div>
+
+  <div class="challenge-card">
+    <div class="cico">🎯</div>
+    <div style="flex:1;">
+      <h3>Défi du jour</h3>
+      <p id="challengeText">Réponds correctement à 10 questions</p>
+      <div class="challenge-track"><div class="challenge-fill" id="challengeFill" style="width:0%"></div></div>
+    </div>
+    <div class="challenge-badge" id="challengeBadge">+50 ✨</div>
+  </div>
+
+  <div class="islands" id="islandList">
+    <div class="island math" data-game="math">
+      <div class="icon-badge">🔢</div>
+      <div><h3>Mathématiques</h3><p>Décimaux, fractions, géométrie, mesures</p></div>
+      <div class="go">Jouer</div>
+    </div>
+    <div class="island francais" data-game="francais">
+      <div class="icon-badge">📚</div>
+      <div><h3>Français</h3><p>Grammaire, conjugaison, orthographe</p></div>
+      <div class="go">Jouer</div>
+    </div>
+    <div class="island histoire" data-game="histoire">
+      <div class="icon-badge">🏰</div>
+      <div><h3>Histoire</h3><p>Révolution, XIXe et XXe siècle</p></div>
+      <div class="go">Jouer</div>
+    </div>
+    <div class="island geo" data-game="geo">
+      <div class="icon-badge">🌍</div>
+      <div><h3>Géographie</h3><p>La France et l'Europe</p></div>
+      <div class="go">Jouer</div>
+    </div>
+    <div class="island sciences" data-game="sciences">
+      <div class="icon-badge">🔬</div>
+      <div><h3>Sciences</h3><p>Le corps, la matière, l'espace</p></div>
+      <div class="go">Jouer</div>
+    </div>
+    <div class="island anglais" data-game="anglais">
+      <div class="icon-badge">🇬🇧</div>
+      <div><h3>Anglais</h3><p>Vocabulaire et phrases simples</p></div>
+      <div class="go">Jouer</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE: GAME ============ -->
+<div class="page" id="page-game">
+  <div class="game-card">
+    <div class="game-card-header">
+      <h2 id="gameTitle">Île</h2>
+      <button class="back-btn" id="backBtn">← Retour à la carte</button>
+    </div>
+
+    <div id="quizArea">
+      <div class="score-row">
+        <div class="pill" id="scorePill">⭐ Bonnes réponses : 0</div>
+        <div class="pill" id="progressPill">Question 1 / 5</div>
+      </div>
+      <div class="question-box"><div class="qtext" id="qtext">...</div></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="nextBtn">Question suivante →</button>
+    </div>
+
+    <div class="win-screen" id="winScreen">
+      <div class="big-emoji">🏆</div>
+      <h2>Bravo, explorateur !</h2>
+      <p id="winScoreText">Tu as eu 5 sur 5 !</p>
+      <div class="xp-gain" id="xpGainText">+50 ✨ XP gagnée !</div>
+      <button class="retry-btn" id="retryBtn">Rejouer</button>
+      <button class="map-btn" id="mapBtn">Retour à la carte</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE: PROFILE ============ -->
+<div class="page" id="page-profile">
+  <div class="profile-hero">
+    <div class="profile-banner" id="profileBanner"></div>
+
+    <div class="avatar-wrap">
+      <div class="avatar-stage" id="avatarBig" style="background:#EAF6FF;">
+        <span class="hat" id="avatarHat"></span>
+        <div class="avatar-face" id="avatarFace">🙂</div>
+        <span class="accessory" id="avatarAccessory"></span>
+        <span class="pet" id="avatarPet"></span>
+      </div>
+      <div class="photo-controls">
+        <button class="photo-btn" id="photoBtn">📷 Changer la photo</button>
+        <button class="photo-btn ghost" id="removePhotoBtn">🗑️ Retirer</button>
+        <input type="file" id="photoInput" accept="image/*" style="display:none">
+      </div>
+    </div>
+
+    <div class="profile-info">
+      <h2>Mon profil</h2>
+      <label class="name-label" for="nameInput">Mon prénom</label>
+      <input type="text" id="nameInput" class="name-input" maxlength="18" placeholder="Ton prénom">
+      <div class="lvl-big" id="profileLvl">Niveau 1</div>
+      <div class="profile-stats">
+        <div class="stat"><div class="num" id="statXp">0</div><div class="lab">XP totale</div></div>
+        <div class="stat"><div class="num" id="statCoins">0</div><div class="lab">✨ à dépenser</div></div>
+        <div class="stat"><div class="num" id="statGames">0</div><div class="lab">Parties jouées</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shop-section">
+    <h3>🎩 Chapeaux</h3>
+    <div class="shop-grid" id="shopHats"></div>
+    <h3>🐾 Compagnons</h3>
+    <div class="shop-grid" id="shopPets"></div>
+    <h3>🕶️ Accessoires</h3>
+    <div class="shop-grid" id="shopAccessories"></div>
+    <h3>🎏 Banderoles</h3>
+    <div class="shop-grid" id="shopBanners"></div>
+    <h3>🎨 Fonds</h3>
+    <div class="shop-grid" id="shopBgs"></div>
+  </div>
+</div>
+
+<footer>Fait avec 💛 pour Anaëlle et tous les petits curieux</footer>
+
+</div><!-- /appRoot -->
+
+<script>
+(function(){
+  /* ---------------- INTRO ANIMATION ---------------- */
+  const heartsContainer = document.getElementById('introHearts');
+  const heartEmojis = ['💛','⭐','✨','💚','🌟'];
+  for(let i=0;i<14;i++){
+    const span = document.createElement('span');
+    span.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+    span.style.left = Math.random()*100 + '%';
+    span.style.animationDuration = (5 + Math.random()*5) + 's';
+    span.style.animationDelay = (Math.random()*5) + 's';
+    span.style.fontSize = (1 + Math.random()*1.2) + 'rem';
+    heartsContainer.appendChild(span);
+  }
+
+  document.getElementById('introBtn').addEventListener('click', () => {
+    const overlay = document.getElementById('introOverlay');
+    overlay.classList.add('hide');
+    document.body.classList.remove('intro-active');
+    document.getElementById('appRoot').classList.add('visible');
+    setTimeout(() => { overlay.style.display = 'none'; }, 550);
+  });
+})();
+
+(async function(){
+
+  /* ---------------- DATA : PROGRAMME CM2 ---------------- */
+  const GAMES = {
+    math: { title:"Mathématiques 🔢", questions:[
+      {q:"3,5 + 2,7 = ?", choices:["6,2","5,2","6,12","62"], answer:"6,2"},
+      {q:"1/4 de 100 = ?", choices:["25","20","40","4"], answer:"25"},
+      {q:"236 × 4 = ?", choices:["944","924","934","864"], answer:"944"},
+      {q:"Combien de centimètres dans 3,5 mètres ?", choices:["350","35","3500","305"], answer:"350"},
+      {q:"Un rectangle mesure 8 cm sur 5 cm. Son périmètre est :", choices:["26 cm","40 cm","13 cm","20 cm"], answer:"26 cm"},
+      {q:"1 254 : 6 = ?", choices:["209","210","219","201"], answer:"209"},
+      {q:"Quel est le double de 375 ?", choices:["750","700","675","800"], answer:"750"},
+      {q:"0,5 + 0,25 = ?", choices:["0,75","0,7","1,25","0,55"], answer:"0,75"},
+      {q:"Combien font 15 % de 200 ?", choices:["30","15","20","150"], answer:"30"},
+      {q:"Un carré a un côté de 6 cm. Son aire est :", choices:["36 cm²","24 cm²","12 cm²","30 cm²"], answer:"36 cm²"},
+    ]},
+    francais: { title:"Français 📚", questions:[
+      {q:"Quel est le sujet : 'Les enfants jouent dans le jardin.' ?", choices:["Les enfants","jouent","dans le jardin","le jardin"], answer:"Les enfants"},
+      {q:"Futur simple de 'aller', 3e pers. sing. : Il ___ à l'école.", choices:["ira","allera","va","allait"], answer:"ira"},
+      {q:"'___ chien est fidèle.'", choices:["Son","Sont","S'on","Sons"], answer:"Son"},
+      {q:"Le pluriel de 'un cheval' :", choices:["des chevals","des chevaux","des chevales","des chevaus"], answer:"des chevaux"},
+      {q:"Le COD dans : 'Marie mange une pomme.' ?", choices:["une pomme","Marie","mange","aucun"], answer:"une pomme"},
+      {q:"Imparfait de 'finir', je :", choices:["finissais","finirai","finis","finissait"], answer:"finissais"},
+      {q:"Quel mot est un adverbe ?", choices:["rapidement","rapide","rapidité","rapides"], answer:"rapidement"},
+      {q:"'Ces enfants ___ contents.'", choices:["sont","son","c'ont","s'ont"], answer:"sont"},
+      {q:"Le contraire de 'ancien' :", choices:["moderne","vieux","antique","passé"], answer:"moderne"},
+      {q:"Le verbe au passé composé : 'Elle a mangé une pomme.'", choices:["a mangé","mangé","mangera","mangeait"], answer:"a mangé"},
+    ]},
+    histoire: { title:"Histoire 🏰", questions:[
+      {q:"En quelle année a eu lieu la prise de la Bastille ?", choices:["1789","1815","1901","1958"], answer:"1789"},
+      {q:"Qui était roi au début de la Révolution française ?", choices:["Louis XVI","Napoléon","Louis XIV","Charles X"], answer:"Louis XVI"},
+      {q:"Quel empereur a régné au début du XIXe siècle ?", choices:["Napoléon Bonaparte","Louis XVIII","Louis-Philippe","Jules Ferry"], answer:"Napoléon Bonaparte"},
+      {q:"La Première Guerre mondiale a eu lieu de :", choices:["1914 à 1918","1939 à 1945","1900 à 1905","1918 à 1922"], answer:"1914 à 1918"},
+      {q:"La Seconde Guerre mondiale a eu lieu de :", choices:["1939 à 1945","1914 à 1918","1929 à 1935","1945 à 1950"], answer:"1939 à 1945"},
+      {q:"Quelle devise résume les valeurs de la République ?", choices:["Liberté, Égalité, Fraternité","Paix, Travail, Patrie","Unité, Justice, Progrès","Ordre et Progrès"], answer:"Liberté, Égalité, Fraternité"},
+      {q:"Quel symbole représente la République française ?", choices:["Marianne","Le sphinx","L'aigle","Le lion"], answer:"Marianne"},
+      {q:"Jules Ferry a rendu l'école :", choices:["gratuite et obligatoire","payante","facultative","militaire"], answer:"gratuite et obligatoire"},
+      {q:"Au XIXe siècle, la France se transforme grâce à :", choices:["l'industrialisation","la colonisation romaine","l'invention de l'écriture","les pyramides"], answer:"l'industrialisation"},
+      {q:"L'Union européenne a été créée pour :", choices:["favoriser la paix entre pays","conquérir des territoires","remplacer les présidents","créer une seule langue"], answer:"favoriser la paix entre pays"},
+    ]},
+    geo: { title:"Géographie 🌍", questions:[
+      {q:"Quelle est la capitale de la France ?", choices:["Paris","Lyon","Marseille","Lille"], answer:"Paris"},
+      {q:"La France fait partie de quel continent ?", choices:["Europe","Afrique","Asie","Amérique"], answer:"Europe"},
+      {q:"Quel océan borde la France à l'ouest ?", choices:["L'océan Atlantique","L'océan Pacifique","L'océan Indien","La mer Caspienne"], answer:"L'océan Atlantique"},
+      {q:"Quel est le plus long fleuve de France ?", choices:["La Loire","La Seine","Le Rhône","La Garonne"], answer:"La Loire"},
+      {q:"Comment appelle-t-on les territoires français hors d'Europe ?", choices:["Les territoires ultramarins","Les colonies","Les régions voisines","Les cantons"], answer:"Les territoires ultramarins"},
+      {q:"Quelle chaîne sépare la France de l'Espagne ?", choices:["Les Pyrénées","Les Alpes","Le Massif central","Les Vosges"], answer:"Les Pyrénées"},
+      {q:"Quelle monnaie utilise-t-on en France ?", choices:["L'euro","Le franc","Le dollar","La livre"], answer:"L'euro"},
+      {q:"Quel train traverse rapidement l'Europe ?", choices:["Le TGV","Le vélo","La calèche","Le tracteur"], answer:"Le TGV"},
+      {q:"Une grande ville très peuplée est appelée :", choices:["une métropole","un hameau","un désert","une plaine"], answer:"une métropole"},
+      {q:"Quel est le point culminant de France ?", choices:["Le Mont Blanc","Le Mont Ventoux","Le Puy de Dôme","Le Mont Everest"], answer:"Le Mont Blanc"},
+    ]},
+    sciences: { title:"Sciences 🔬", questions:[
+      {q:"Quel organe fait circuler le sang ?", choices:["Le cœur","Le poumon","L'estomac","Le cerveau"], answer:"Le cœur"},
+      {q:"L'eau se transforme en glace quand elle :", choices:["se refroidit","chauffe","s'évapore","bout"], answer:"se refroidit"},
+      {q:"Quelle planète est surnommée la planète rouge ?", choices:["Mars","Vénus","Jupiter","Saturne"], answer:"Mars"},
+      {q:"Le mouvement de la Terre autour du Soleil s'appelle :", choices:["La révolution","La rotation","La gravitation","L'éclipse"], answer:"La révolution"},
+      {q:"Quel gaz les plantes absorbent-elles pour se nourrir ?", choices:["Le dioxyde de carbone","L'oxygène","L'azote","L'hydrogène"], answer:"Le dioxyde de carbone"},
+      {q:"La vapeur d'eau est un état :", choices:["Gazeux","Liquide","Solide","Aucun"], answer:"Gazeux"},
+      {q:"En combien de temps la Terre tourne-t-elle sur elle-même ?", choices:["24 heures","1 an","30 jours","1 heure"], answer:"24 heures"},
+      {q:"Quel est le rôle des poumons ?", choices:["Respirer","Digérer","Penser","Filtrer le sang"], answer:"Respirer"},
+      {q:"Quelle énergie utilise la lumière du Soleil ?", choices:["L'énergie solaire","L'énergie éolienne","L'énergie hydraulique","L'énergie nucléaire"], answer:"L'énergie solaire"},
+      {q:"Quel instrument mesure la température ?", choices:["Le thermomètre","Le baromètre","La balance","Le chronomètre"], answer:"Le thermomètre"},
+    ]},
+    anglais: { title:"Anglais 🇬🇧", questions:[
+      {q:"Comment dit-on 'bonjour' en anglais ?", choices:["Hello","Goodbye","Please","Sorry"], answer:"Hello"},
+      {q:"'Cat' veut dire :", choices:["Chat","Chien","Cheval","Oiseau"], answer:"Chat"},
+      {q:"Comment dit-on 'merci' ?", choices:["Thank you","Sorry","Please","Yes"], answer:"Thank you"},
+      {q:"'Monday' est :", choices:["Lundi","Mardi","Dimanche","Samedi"], answer:"Lundi"},
+      {q:"Comment dit-on 'sept' en anglais ?", choices:["Seven","Six","Eight","Nine"], answer:"Seven"},
+      {q:"'Red' veut dire :", choices:["Rouge","Bleu","Vert","Jaune"], answer:"Rouge"},
+      {q:"'How are you?' veut dire :", choices:["Comment vas-tu ?","Quel âge as-tu ?","Où habites-tu ?","Comment tu t'appelles ?"], answer:"Comment vas-tu ?"},
+      {q:"'Dog' veut dire :", choices:["Chien","Chat","Lapin","Souris"], answer:"Chien"},
+      {q:"Comment dit-on 'école' en anglais ?", choices:["School","House","Book","Teacher"], answer:"School"},
+      {q:"'I am ten years old' veut dire :", choices:["J'ai dix ans","J'ai neuf ans","J'ai onze ans","Je suis à l'heure"], answer:"J'ai dix ans"},
+    ]}
+  };
+
+  const SHOP = {
+    hats: [
+      {id:'hat_cap', emoji:'🧢', name:'Casquette', price:0},
+      {id:'hat_flower', emoji:'🌸', name:'Fleur', price:45},
+      {id:'hat_party', emoji:'🎉', name:'Fête', price:30},
+      {id:'hat_grad', emoji:'🎓', name:'Diplômé', price:60},
+      {id:'hat_medal', emoji:'🎖️', name:'Médaille', price:120},
+      {id:'hat_crown', emoji:'👑', name:'Couronne', price:150},
+      {id:'hat_wizard', emoji:'🧙', name:'Sorcier', price:200},
+    ],
+    pets: [
+      {id:'pet_dog', emoji:'🐶', name:'Chien', price:0},
+      {id:'pet_cat', emoji:'🐱', name:'Chat', price:40},
+      {id:'pet_owl', emoji:'🦉', name:'Hibou', price:60},
+      {id:'pet_fox', emoji:'🦊', name:'Renard', price:80},
+      {id:'pet_panda', emoji:'🐼', name:'Panda', price:130},
+      {id:'pet_dragon', emoji:'🐉', name:'Dragon', price:220},
+      {id:'pet_unicorn', emoji:'🦄', name:'Licorne', price:300},
+    ],
+    accessories: [
+      {id:'acc_none', emoji:'🚫', name:'Aucun', price:0},
+      {id:'acc_glasses', emoji:'🕶️', name:'Lunettes', price:35},
+      {id:'acc_bowtie', emoji:'🎀', name:'Nœud papillon', price:40},
+      {id:'acc_scarf', emoji:'🧣', name:'Écharpe', price:55},
+      {id:'acc_necklace', emoji:'📿', name:'Collier', price:70},
+      {id:'acc_wings', emoji:'🧚', name:'Ailes de fée', price:120},
+    ],
+    banners: [
+      {id:'ban_none', emoji:'🚫', name:'Aucune', price:0, pattern:[]},
+      {id:'ban_confetti', emoji:'🎉', name:'Confettis', price:40, pattern:['🎉','🎊']},
+      {id:'ban_stars', emoji:'⭐', name:'Étoiles', price:60, pattern:['⭐','✨']},
+      {id:'ban_hearts', emoji:'💕', name:'Cœurs', price:80, pattern:['💕','🌸']},
+      {id:'ban_party', emoji:'🎈', name:'Anniversaire', price:100, pattern:['🎈','🎀']},
+      {id:'ban_rainbow', emoji:'🌈', name:'Arc-en-ciel', price:150, pattern:['🔴','🟠','🟡','🟢','🔵','🟣']},
+      {id:'ban_unicorn', emoji:'🦄', name:'Licornes', price:250, pattern:['🦄','✨']},
+    ],
+    bgs: [
+      {id:'bg_sky', emoji:'🟦', name:'Ciel', price:0, color:'#EAF6FF'},
+      {id:'bg_sun', emoji:'🟨', name:'Soleil', price:25, color:'#FFF3D6'},
+      {id:'bg_leaf', emoji:'🟩', name:'Jungle', price:50, color:'#E6F8EE'},
+      {id:'bg_candy', emoji:'🟪', name:'Bonbon', price:100, color:'#F1EAFF'},
+      {id:'bg_night', emoji:'🌙', name:'Nuit étoilée', price:140, color:'linear-gradient(135deg,#2b2f6b,#4AC7E0)'},
+      {id:'bg_rain', emoji:'🌈', name:'Arc-en-ciel', price:180, color:'linear-gradient(135deg,#FFE1E1,#E1F5FF,#FFF6D6)'},
+      {id:'bg_gold', emoji:'✨', name:'Doré', price:260, color:'linear-gradient(135deg,#FFE9B0,#FFC738)'},
+    ]
+  };
+
+  const XP_PER_CORRECT = 10;
+  const DAILY_TARGET = 10;
+  const DAILY_REWARD = 50;
+
+  function defaultProfile(){
+    return {
+      name: 'Anaëlle',
+      photo: null,
+      totalXp: 0,
+      coins: 0,
+      gamesPlayed: 0,
+      owned: ['hat_cap','pet_dog','bg_sky','acc_none','ban_none'],
+      equipped: { hat:'hat_cap', pet:'pet_dog', bg:'bg_sky', accessory:'acc_none', banner:'ban_none' },
+      daily: { date: todayStr(), correct: 0, claimed: false }
+    };
+  }
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+  let profile = defaultProfile();
+
+  async function loadProfile(){
+    try{
+      const res = await window.storage.get('profile', false);
+      if(res && res.value){
+        const saved = JSON.parse(res.value);
+        const base = defaultProfile();
+        profile = {
+          ...base,
+          ...saved,
+          equipped: { ...base.equipped, ...(saved.equipped || {}) },
+          owned: Array.isArray(saved.owned) && saved.owned.length
+            ? Array.from(new Set([...base.owned, ...saved.owned]))
+            : base.owned,
+          daily: { ...base.daily, ...(saved.daily || {}) },
+        };
+        if(profile.daily.date !== todayStr()){
+          profile.daily = { date: todayStr(), correct:0, claimed:false };
+        }
+        await saveProfile();
+      }
+    }catch(e){ /* pas encore de profil sauvegardé, on garde les valeurs par défaut */ }
+  }
+  async function saveProfile(){
+    try{ await window.storage.set('profile', JSON.stringify(profile), false); }
+    catch(e){ console.error('Erreur de sauvegarde', e); }
+  }
+
+  function levelFromXp(xp){ return Math.floor(xp / 100) + 1; }
+  function xpIntoLevel(xp){ return xp % 100; }
+
+  function currentBg(){ return (SHOP.bgs.find(b => b.id === profile.equipped.bg) || SHOP.bgs[0]).color; }
+  function currentHatEmoji(){ const i = SHOP.hats.find(h => h.id === profile.equipped.hat); return i ? i.emoji : ''; }
+  function currentPetEmoji(){ const i = SHOP.pets.find(p => p.id === profile.equipped.pet); return i ? i.emoji : ''; }
+  function currentAccessoryEmoji(){ const i = SHOP.accessories.find(a => a.id === profile.equipped.accessory); return (i && i.id !== 'acc_none') ? i.emoji : ''; }
+  function currentBanner(){ return SHOP.banners.find(b => b.id === profile.equipped.banner) || SHOP.banners[0]; }
+
+  function renderGreeting(){
+    document.getElementById('greetName').textContent = profile.name || 'championne';
+  }
+
+  function applyFaceTo(faceEl, isMini){
+    if(profile.photo){
+      faceEl.style.backgroundImage = `url(${profile.photo})`;
+      faceEl.textContent = '';
+    } else {
+      faceEl.style.backgroundImage = 'none';
+      faceEl.textContent = '🙂';
+    }
+  }
+
+  function renderTopbar(){
+    const lvl = levelFromXp(profile.totalXp);
+    document.getElementById('lvlLabel').textContent = `Niveau ${lvl}`;
+    document.getElementById('xpBarFill').style.width = xpIntoLevel(profile.totalXp) + '%';
+    document.getElementById('coinCount').textContent = profile.coins;
+    const mini = document.getElementById('avatarMini');
+    if(profile.photo){
+      mini.style.backgroundImage = `url(${profile.photo})`;
+      mini.textContent = '';
+    } else {
+      mini.style.backgroundImage = 'none';
+      mini.style.background = currentBg();
+      mini.textContent = '🙂';
+    }
+  }
+
+  function renderChallenge(){
+    const pct = Math.min(100, Math.round((profile.daily.correct / DAILY_TARGET) * 100));
+    document.getElementById('challengeFill').style.width = pct + '%';
+    const badge = document.getElementById('challengeBadge');
+    const txt = document.getElementById('challengeText');
+    if(profile.daily.claimed){
+      badge.textContent = 'Fait ✓'; badge.classList.add('done');
+      txt.textContent = `Défi terminé pour aujourd'hui, reviens demain !`;
+    } else {
+      badge.classList.remove('done'); badge.textContent = `+${DAILY_REWARD} ✨`;
+      txt.textContent = `Réponds correctement à ${DAILY_TARGET} questions (${profile.daily.correct}/${DAILY_TARGET})`;
+    }
+  }
+
+  async function maybeClaimDaily(){
+    if(!profile.daily.claimed && profile.daily.correct >= DAILY_TARGET){
+      profile.daily.claimed = true;
+      profile.coins += DAILY_REWARD;
+      await saveProfile();
+      renderTopbar(); renderChallenge();
+    }
+  }
+
+  function renderBanner(){
+    const item = currentBanner();
+    const el = document.getElementById('profileBanner');
+    if(!item || !item.pattern || item.pattern.length === 0){
+      el.style.display = 'none'; el.innerHTML = ''; return;
+    }
+    el.style.display = 'flex';
+    let html = '';
+    for(let i=0;i<9;i++){ html += `<span>${item.pattern[i % item.pattern.length]}</span>`; }
+    el.innerHTML = html;
+  }
+
+  function renderProfilePage(){
+    document.getElementById('profileLvl').textContent = `Niveau ${levelFromXp(profile.totalXp)}`;
+    document.getElementById('statXp').textContent = profile.totalXp;
+    document.getElementById('statCoins').textContent = profile.coins;
+    document.getElementById('statGames').textContent = profile.gamesPlayed;
+    document.getElementById('nameInput').value = profile.name;
+
+    document.getElementById('avatarBig').style.background = currentBg();
+    applyFaceTo(document.getElementById('avatarFace'));
+    document.getElementById('avatarHat').textContent = currentHatEmoji();
+    document.getElementById('avatarPet').textContent = currentPetEmoji();
+    document.getElementById('avatarAccessory').textContent = currentAccessoryEmoji();
+    renderBanner();
+
+    renderShopGrid('shopHats', SHOP.hats, 'hat');
+    renderShopGrid('shopPets', SHOP.pets, 'pet');
+    renderShopGrid('shopAccessories', SHOP.accessories, 'accessory');
+    renderShopGrid('shopBanners', SHOP.banners, 'banner');
+    renderShopGrid('shopBgs', SHOP.bgs, 'bg');
+  }
+
+  function renderShopGrid(containerId, items, slot){
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    items.forEach(item => {
+      const owned = profile.owned.includes(item.id);
+      const equipped = profile.equipped[slot] === item.id;
+      const affordable = profile.coins >= item.price;
+      const div = document.createElement('div');
+      div.className = 'shop-item' + (owned ? ' owned' : '') + (equipped ? ' equipped' : '') + (!owned && !affordable ? ' locked' : '');
+      div.innerHTML = `<div class="emoji">${item.emoji}</div><div class="name">${item.name}</div>
+        <div class="price">${equipped ? 'Équipé ✓' : owned ? 'Possédé' : '✨ ' + item.price}</div>`;
+      div.addEventListener('click', () => handleShopClick(item, slot, owned, affordable));
+      el.appendChild(div);
+    });
+  }
+
+  async function handleShopClick(item, slot, owned, affordable){
+    if(owned){ profile.equipped[slot] = item.id; }
+    else if(affordable){ profile.coins -= item.price; profile.owned.push(item.id); profile.equipped[slot] = item.id; }
+    else return;
+    await saveProfile();
+    renderTopbar(); renderProfilePage();
+  }
+
+  /* ---------------- NAME + PHOTO CONTROLS ---------------- */
+  const nameInput = document.getElementById('nameInput');
+  nameInput.addEventListener('input', () => { document.getElementById('greetName').textContent = nameInput.value.trim() || 'championne'; });
+  nameInput.addEventListener('change', async () => {
+    profile.name = nameInput.value.trim() || 'Anaëlle';
+    nameInput.value = profile.name;
+    await saveProfile();
+    renderGreeting();
+  });
+
+  function resizeImageFile(file, maxSize, quality){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          const scale = Math.min(1, maxSize / Math.max(w, h));
+          w = Math.round(w * scale); h = Math.round(h * scale);
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('photoBtn').addEventListener('click', () => document.getElementById('photoInput').click());
+  document.getElementById('photoInput').addEventListener('change', async (ev) => {
+    const file = ev.target.files[0];
+    ev.target.value = '';
+    if(!file) return;
+    try{
+      const dataUrl = await resizeImageFile(file, 220, 0.85);
+      profile.photo = dataUrl;
+      await saveProfile();
+      renderTopbar(); renderProfilePage();
+    }catch(err){ console.error('Impossible de charger la photo', err); }
+  });
+  document.getElementById('removePhotoBtn').addEventListener('click', async () => {
+    profile.photo = null;
+    await saveProfile();
+    renderTopbar(); renderProfilePage();
+  });
+
+  /* ---------------- NAVIGATION ---------------- */
+  function showPage(id){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.page === id));
+    if(id === 'profile') renderProfilePage();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  document.querySelectorAll('.nav-tab').forEach(t => t.addEventListener('click', () => showPage(t.dataset.page)));
+
+  /* ---------------- GAME LOGIC ---------------- */
+  let currentGameKey = null, order = [], idx = 0, correctCount = 0;
+  const ROUND_LEN = 5;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+
+  function startGame(key){
+    currentGameKey = key;
+    const game = GAMES[key];
+    document.getElementById('gameTitle').textContent = game.title;
+    order = shuffle(game.questions).slice(0, Math.min(ROUND_LEN, game.questions.length));
+    idx = 0; correctCount = 0;
+    document.getElementById('winScreen').classList.remove('show');
+    document.getElementById('quizArea').style.display = 'block';
+    showPage('game');
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('nextBtn').classList.remove('show');
+    document.getElementById('scorePill').textContent = `⭐ Bonnes réponses : ${correctCount}`;
+    document.getElementById('progressPill').textContent = `Question ${idx+1} / ${order.length}`;
+    const current = order[idx];
+    document.getElementById('qtext').textContent = current.q;
+    const choicesEl = document.getElementById('choices');
+    choicesEl.innerHTML = '';
+    shuffle(current.choices).forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => selectAnswer(btn, choice, current.answer));
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  async function selectAnswer(btn, choice, answer){
+    document.querySelectorAll('#choices .choice-btn').forEach(b => b.disabled = true);
+    const feedback = document.getElementById('feedback');
+    if(choice === answer){
+      btn.classList.add('correct');
+      feedback.textContent = 'Bravo, bonne réponse ! 🎉'; feedback.style.color = 'var(--jungle-dark)';
+      correctCount++;
+      profile.daily.correct++;
+      await maybeClaimDaily();
+      await saveProfile();
+      renderChallenge();
+    } else {
+      btn.classList.add('wrong');
+      feedback.textContent = `Presque ! La bonne réponse était : ${answer}`; feedback.style.color = 'var(--coral)';
+      document.querySelectorAll('#choices .choice-btn').forEach(b => { if(b.textContent === answer) b.classList.add('correct'); });
+    }
+    document.getElementById('scorePill').textContent = `⭐ Bonnes réponses : ${correctCount}`;
+    document.getElementById('nextBtn').classList.add('show');
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', async () => {
+    idx++;
+    if(idx < order.length){ renderQuestion(); }
+    else {
+      document.getElementById('quizArea').style.display = 'none';
+      const xpGain = correctCount * XP_PER_CORRECT;
+      profile.totalXp += xpGain;
+      profile.coins += xpGain;
+      profile.gamesPlayed++;
+      await saveProfile();
+      renderTopbar();
+      document.getElementById('winScoreText').textContent = `Tu as eu ${correctCount} sur ${order.length} !`;
+      document.getElementById('xpGainText').textContent = `+${xpGain} ✨ XP gagnée !`;
+      document.getElementById('winScreen').classList.add('show');
+    }
+  });
+
+  document.getElementById('retryBtn').addEventListener('click', () => startGame(currentGameKey));
+  document.getElementById('mapBtn').addEventListener('click', () => showPage('home'));
+  document.getElementById('backBtn').addEventListener('click', () => showPage('home'));
+  document.querySelectorAll('#islandList .island').forEach(el => el.addEventListener('click', () => startGame(el.dataset.game)));
+
+  await loadProfile();
+  renderTopbar();
+  renderChallenge();
+  renderGreeting();
+})();
+</script>
+
+</body>
+</html>
